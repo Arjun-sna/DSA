@@ -31,6 +31,8 @@ public class TrieImplementation {
 
     System.out.println(trie.isAWord(wordToSearch));
 
+    trie.deleteNode(wordToSearch);
+
     scanner.close();
   }
 
@@ -39,6 +41,7 @@ public class TrieImplementation {
     private class TrieNode {
       //Map<Character, TrieNode> children;
       TrieNode[] children;
+      int childrenCount = 0;
       boolean isEndOfWord = false;
 
       public TrieNode() {
@@ -60,6 +63,7 @@ public class TrieImplementation {
         if (node == null) {
           node = new TrieNode();
           currentNode.children[index] = node;
+          currentNode.childrenCount++;
         }
         currentNode = node;
       }
@@ -77,6 +81,32 @@ public class TrieImplementation {
         currentNode = node;
       }
       return currentNode.isEndOfWord;
+    }
+
+    public void deleteNode(String word) {
+      delete(root, word, 0);
+    }
+
+    private boolean delete(TrieNode currentNode, String word, int index) {
+      if (index == word.length()) {
+        if (!currentNode.isEndOfWord) {
+          return false;
+        }
+
+        currentNode.isEndOfWord = false;
+        return currentNode.childrenCount == 0;
+      }
+
+      char ch = word.charAt(index);
+      TrieNode node = currentNode.children[ch - 'a'];
+      boolean shouldDeleteCurrentNode = delete(node, word, index + 1);
+      if (shouldDeleteCurrentNode) {
+        currentNode.children[ch - 'a'] = null;
+        currentNode.childrenCount--;
+        return currentNode.childrenCount == 0;
+      }
+
+      return false;
     }
   }
 }
